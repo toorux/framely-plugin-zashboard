@@ -110,7 +110,7 @@ TUN 网卡改为 `zashboard-tun`（13 字符），运行配置和就绪检查共
 
 ## GitHub 自动构建与发布
 
-源码仓库：https://github.com/toorux/framely-plugin-zashboard 。推送 `main` 或提交 Pull Request 会在 Ubuntu 24.04 ARM64 上安装锁定依赖、检查格式和类型、构建真实离线 payload、运行测试并上传 `.framely` 和 `SHA256SUMS` 作为 Actions Artifact。设备端无需开发工具。
+源码仓库：https://github.com/toorux/framely-plugin-zashboard 。与透视插件一致，仅推送 `v*` 版本标签时自动构建并发布，普通分支推送和 Pull Request 不触发打包。Release Action 在 Ubuntu 24.04 ARM64 上安装锁定依赖、检查格式和类型、构建真实离线 payload、运行测试并发布 `.framely` 和 `SHA256SUMS`。设备端无需开发工具。
 
 发布时，先更新 manifest.json、package.json 和 package-lock.json 的版本，提交后创建与 manifest.version 一致的标签，例如 `v0.1.0-preview.15`，再推送标签。Release Action 构建并校验安装包，发布对应 GitHub Release；预览版自动标为 prerelease。也可在对应标签上手动运行 Release workflow。
 
