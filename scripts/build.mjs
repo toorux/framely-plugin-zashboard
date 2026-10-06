@@ -15,7 +15,7 @@ await build({entryPoints:['vendor/framely-sdk/src/bootstrap.ts'],outfile:'payloa
 await mkdir('payload/dashboard',{recursive:true});
 await copyFile('payload/bridge.js','payload/dashboard/framely-bridge.js');
 if(!process.argv.includes('--ui-only')){
- for(const [from,to] of [['assets/icon.png','icon.png'],['LICENSE','LICENSE'],['README.md','README.md'],['THIRD_PARTY_NOTICES.md','THIRD_PARTY_NOTICES.md'],['GEO_DATA_NOTICES.md','GEO_DATA_NOTICES.md'],['upstream.lock.json','upstream.lock.json'],['vendor/framely-sdk/LICENSE','LICENSE.framely-sdk'],['node_modules/react/LICENSE','LICENSE.react'],['node_modules/react-dom/LICENSE','LICENSE.react-dom']])await copyFile(from,`payload/${to}`);
+ for(const [from,to] of [['icon.png','icon.png'],['LICENSE','LICENSE'],['README.md','README.md'],['THIRD_PARTY_NOTICES.md','THIRD_PARTY_NOTICES.md'],['GEO_DATA_NOTICES.md','GEO_DATA_NOTICES.md'],['upstream.lock.json','upstream.lock.json'],['vendor/framely-sdk/LICENSE','LICENSE.framely-sdk'],['node_modules/react/LICENSE','LICENSE.react'],['node_modules/react-dom/LICENSE','LICENSE.react-dom']])await copyFile(from,`payload/${to}`);
  execFileSync('python3',['scripts/source.py'],{stdio:'inherit'});
 }
 console.log('Built plugin payload; no TUN or system proxy was enabled.');

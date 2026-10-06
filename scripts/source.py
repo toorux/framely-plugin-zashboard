@@ -3,7 +3,7 @@ from pathlib import Path
 import zipfile
 
 root = Path(__file__).resolve().parent.parent
-entries = ['.gitattributes', '.github', 'manifest.json', 'upstream.lock.json', 'package.json', 'package-lock.json', 'tsconfig.json', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'GEO_DATA_NOTICES.md', '.gitignore', 'backend/Cargo.toml', 'backend/Cargo.lock', 'backend/src', 'ui', 'scripts', 'tests', 'assets', 'vendor']
+entries = ['.gitattributes', '.github', 'manifest.json', 'upstream.lock.json', 'package.json', 'package-lock.json', 'tsconfig.json', 'icon.png', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'GEO_DATA_NOTICES.md', '.gitignore', 'backend/Cargo.toml', 'backend/Cargo.lock', 'backend/src', 'ui', 'scripts', 'tests', 'assets', 'vendor']
 with zipfile.ZipFile(root / 'payload/source.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
     for entry in entries:
         path = root / entry
