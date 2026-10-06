@@ -309,7 +309,7 @@ impl Engine {
             .and_then(|g| g["name"].as_str());
         let speed_test = self.speed.as_ref().map(speed::Job::status);
         Ok(
-            json!({"speedTest":speed_test,"primaryGroup":primary_group,"ready":self.initialized,"configured":self.profile.is_some(),"enabled":self.settings.enabled&&self.core.is_some(),"running":self.core.is_some(),"mode":self.settings.mode,"name":self.settings.name,"hasSubscription":!self.settings.subscription.is_empty(),"updatedAt":self.settings.updated_at,"groups":groups,"groupsTruncated":groups_truncated,"connections":connections,"uploadTotal":up,"downloadTotal":down,"error":self.error,"mihomo":"1.19.32","zashboard":"3.29.1"}),
+            json!({"speedTest":speed_test,"primaryGroup":primary_group,"ready":self.initialized,"configured":self.profile.is_some(),"enabled":self.settings.enabled&&self.core.is_some(),"autoStart":self.settings.auto_start,"running":self.core.is_some(),"mode":self.settings.mode,"name":self.settings.name,"hasSubscription":!self.settings.subscription.is_empty(),"updatedAt":self.settings.updated_at,"groups":groups,"groupsTruncated":groups_truncated,"connections":connections,"uploadTotal":up,"downloadTotal":down,"error":self.error,"mihomo":"1.19.32","zashboard":"3.29.1"}),
         )
     }
     fn import(&mut self, text: &str, name: &str, subscription: &str) -> Result<()> {
@@ -385,6 +385,10 @@ impl Engine {
     fn dispatch(&mut self, method: &str, p: &Value) -> Result<Value> {
         match method {
             "framely.lifecycle.start" => {
+                if !self.initialized {
+                    self.settings.apply_startup(self.profile.is_some());
+                    self.save()?;
+                }
                 self.initialized = true;
                 self.restart()?;
                 return Ok(json!({"ready":true}));
@@ -406,6 +410,15 @@ impl Engine {
                 self.settings.enabled = enabled;
                 self.save()?;
                 self.restart()?;
+            }
+            "settings.autoStart" => {
+                let enabled = p["enabled"].as_bool().context("enabled 必须为布尔值")?;
+                let previous = self.settings.auto_start;
+                self.settings.auto_start = enabled;
+                if let Err(error) = self.save() {
+                    self.settings.auto_start = previous;
+                    return Err(error);
+                }
             }
             "service.retry" => {
                 self.restart()?;

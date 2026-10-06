@@ -95,6 +95,7 @@ impl Web {
                                 method,
                                 "status.get"
                                     | "service.set"
+                                    | "settings.autoStart"
                                     | "service.retry"
                                     | "mode.set"
                                     | "proxy.select"

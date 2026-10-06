@@ -31,15 +31,22 @@ pub const LOCAL_NETS: &[&str] = &[
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     pub enabled: bool,
+    pub auto_start: bool,
     pub mode: String,
     pub name: String,
     pub subscription: String,
     pub updated_at: u64,
 }
+impl Settings {
+    pub fn apply_startup(&mut self, configured: bool) {
+        self.enabled = self.auto_start && configured;
+    }
+}
 impl Default for Settings {
     fn default() -> Self {
         Self {
             enabled: false,
+            auto_start: false,
             mode: "rule".into(),
             name: String::new(),
             subscription: String::new(),
@@ -195,6 +202,24 @@ pub fn runtime(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn startup_requires_opt_in_and_profile() {
+        let mut settings: Settings = serde_json::from_value(json!({"enabled": true})).unwrap();
+        assert!(!settings.auto_start);
+        settings.apply_startup(true);
+        assert!(!settings.enabled);
+        settings.auto_start = true;
+        settings.apply_startup(false);
+        assert!(!settings.enabled);
+        settings.apply_startup(true);
+        assert!(settings.enabled);
+        settings.enabled = false;
+        settings.apply_startup(true);
+        assert!(settings.enabled);
+        settings.auto_start = false;
+        settings.apply_startup(true);
+        assert!(!settings.enabled);
+    }
     #[test]
     fn locks_down_root_config() {
         let p = normalize("proxies: [{name: test, type: socks5, server: 127.0.0.1, port: 1080}]\nexternal-controller: 0.0.0.0:9090\nmixed-port: 8888\ntun: {enable: true}\nproxy-providers: {remote: {type: http, url: 'https://example.org/profile', path: /etc/shadow}}\nrules: ['MATCH,test']").unwrap();

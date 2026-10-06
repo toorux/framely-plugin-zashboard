@@ -6,3 +6,6 @@
 .inline-config{display:flex;flex-direction:column;gap:12px;min-width:0}.back-button{align-self:flex-start}.quick .profile{padding:16px}
 
 .node-test{display:flex;gap:12px;align-items:center;margin-top:10px}.node-test button{font-size:14px!important;flex:none}.node-test span{color:var(--muted);font-size:12px}
+
+.auto-start{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;font-size:14px;color:var(--muted)}.auto-start .power{min-height:40px}.auto-start+.mode-note{margin-top:2px}
+.quick .auto-start{margin-top:2px}.quick .auto-start .power{min-height:36px}.quick .modes{margin-top:12px}

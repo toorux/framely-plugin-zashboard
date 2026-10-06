@@ -1,6 +1,6 @@
 # zashboard for Framely
 
-Steam Frame 的独立代理插件：Mihomo 1.19.32 + zashboard 3.29.1。插件 ID `tooru.zashboard`，预览版 `0.1.0-preview.16`。使用 Framely 现有的 root 后端、生命周期和 `localWeb` 窗口能力，无需更改宿主；建议使用仓库当前的 Framely 版本。
+Steam Frame 的独立代理插件：Mihomo 1.19.32 + zashboard 3.29.1。插件 ID `tooru.zashboard`，预览版 `0.1.1-preview.1`。使用 Framely 现有的 root 后端、生命周期和 `localWeb` 窗口能力，无需更改宿主；建议使用仓库当前的 Framely 版本。
 
 ## 使用
 
@@ -74,7 +74,7 @@ Framely 解包时只将后端和生命周期入口设为可执行，Mihomo 附�
 
 ## preview.10 名称统一与旧版迁移
 
-项目目录和 npm 包名为 `framely-plugin-zashboard`，Rust 后端工程为 `framely-zashboard`，插件 ID 为 `tooru.zashboard`，TUN 网卡为 `zashboard-tun`。安装包为 `dist/tooru.zashboard-0.1.0-preview.16.framely`，界面与窗口显示 `zashboard`。
+项目目录和 npm 包名为 `framely-plugin-zashboard`，Rust 后端工程为 `framely-zashboard`，插件 ID 为 `tooru.zashboard`，TUN 网卡为 `zashboard-tun`。安装包为 `dist/tooru.zashboard-0.1.1-preview.1.framely`，界面与窗口显示 `zashboard`。
 
 从旧 ID `tooru.clash` 迁移时，先停用旧插件并等待内核退出，再安装新版并重新导入订阅或配置。宿主按插件 ID 分隔数据目录，新版不自动读取旧版设置。旧包移至 `dist/legacy/`，仅用于回退。
 
@@ -112,10 +112,14 @@ TUN 网卡改为 `zashboard-tun`（13 字符），运行配置和就绪检查共
 
 源码仓库与安装包统一使用根目录 `icon.png`，插件商店可以按固定源码提交读取图标并核对安装包中的图标内容。
 
+## 0.1.1-preview.1 自动开启代理
+
+快捷面板的「启动时自动开启代理」switch 默认关闭，设置保存在本机。启用后，每次插件启动会在已有配置时自动开启 TUN；没有配置时保持关闭。修改该设置不立即切换当前代理，当前状态仍由 TUN 代理 switch 控制。关闭自动开启后，下次启动默认关闭代理。启动失败时显示错误并关闭代理，保留自动开启设置供下次启动重试。
+
 ## GitHub 自动构建与发布
 
 源码仓库：https://github.com/toorux/framely-plugin-zashboard 。与透视插件一致，仅推送 `v*` 版本标签时自动构建并发布，普通分支推送和 Pull Request 不触发打包。Release Action 在 Ubuntu 24.04 ARM64 上安装锁定依赖、检查格式和类型、构建真实离线 payload、运行测试并发布 `.framely` 和 `SHA256SUMS`。设备端无需开发工具。
 
-发布时，先更新 manifest.json、package.json 和 package-lock.json 的版本，提交后创建与 manifest.version 一致的标签，例如 `v0.1.0-preview.16`，再推送标签。Release Action 构建并校验安装包，发布对应 GitHub Release；预览版自动标为 prerelease。也可在对应标签上手动运行 Release workflow。
+发布时，先更新 manifest.json、package.json 和 package-lock.json 的版本，提交后创建与 manifest.version 一致的标签，例如 `v0.1.1-preview.1`，再推送标签。Release Action 构建并校验安装包，发布对应 GitHub Release；预览版自动标为 prerelease。也可在对应标签上手动运行 Release workflow。
 
 发布后可自动更新作者的插件数据库，与透视插件相同：在 GitHub Actions Variables 设置 `DATABASE_REPOSITORY`（作者数据库仓库的 owner/repo），在 Secrets 设置具有该数据库写入权限的 `DATABASE_TOKEN`。配置缺失时跳过登记，不影响安装包发布；可随后手动运行 Register plugin in database 并指定已发布的标签。数据库登记脚本会校验 Release 资产 SHA256，并按稳定版/预览版更新 main/testing 分支。

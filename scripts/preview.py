@@ -10,6 +10,7 @@ if(op==='call'){
  if(method==='proxy.testAll'){const group=state.groups.find(g=>g.name===params.group);group.delays={'香港 01':68,'日本 01':35,'新加坡 01':null,DIRECT:120};state.speedTest={group:group.name,total:group.all.length,completed:group.all.length,running:false};return state;}
  if(method==='mode.set')state.mode=params.mode;
  if(method==='service.set')state.enabled=params.enabled;
+ if(method==='settings.autoStart')state.autoStart=params.enabled;
  if(method==='proxy.select')state.groups.find(g=>g.name===params.group).now=params.name;
  if(['profile.import','profile.commit','subscription.set'].includes(method)){state.configured=true;state.running=true;state.name=window.draftName||params.name||'预览配置';state.updatedAt=Date.now()/1000;state.hasSubscription=method==='subscription.set';}
  if(method==='profile.begin')window.draftName=params.name;
@@ -21,7 +22,7 @@ if(op==='window.open')window.open(p.window==='main'?'/dashboard':'/settings','_b
 if(op==='window.close'||op==='ui.close')window.close();
 return {};
 }};
-const state={ready:true,configured:true,enabled:false,running:true,mode:'rule',name:'我的订阅 · 界面预览',hasSubscription:true,updatedAt:Date.now()/1000,primaryGroup:'代理节点',groups:[{name:'GLOBAL',now:'香港 01',all:['香港 01','日本 01','DIRECT']},{name:'代理节点',now:'香港 01',all:['香港 01','日本 01','新加坡 01','DIRECT']},{name:'流媒体',now:'日本 01',all:['日本 01','香港 01','DIRECT']}],groupsTruncated:false,connections:0,uploadTotal:0,downloadTotal:0,error:null,mihomo:'1.19.32',zashboard:'3.29.1'};
+const state={ready:true,configured:true,enabled:false,autoStart:false,running:true,mode:'rule',name:'我的订阅 · 界面预览',hasSubscription:true,updatedAt:Date.now()/1000,primaryGroup:'代理节点',groups:[{name:'GLOBAL',now:'香港 01',all:['香港 01','日本 01','DIRECT']},{name:'代理节点',now:'香港 01',all:['香港 01','日本 01','新加坡 01','DIRECT']},{name:'流媒体',now:'日本 01',all:['日本 01','香港 01','DIRECT']}],groupsTruncated:false,connections:0,uploadTotal:0,downloadTotal:0,error:null,mihomo:'1.19.32',zashboard:'3.29.1'};
 const scenario=new URLSearchParams(location.search).get('scenario');
 if(scenario==='empty'){state.configured=false;state.running=false;state.groups=[];state.name='';state.hasSubscription=false;}
 if(scenario==='error'){state.running=false;state.error='代理内核已退出，代理已关闭；可重试启动';}

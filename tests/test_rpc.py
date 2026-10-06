@@ -244,8 +244,58 @@ class Integration(unittest.TestCase):
                 self.assertFalse(state['running'])
                 self.assertFalse(state['enabled'])
                 self.assertFalse((data/'core.json').exists())
+                session.call('settings.autoStart', {'enabled':True})
+                session.close()
+                path = data/'state.json'
+                stored = json.loads(path.read_text())
+                stored['profile'] = {'proxies':[{'name':'test','type':'socks5','server':'127.0.0.1','port':1080}],'rules':['MATCH,DIRECT']}
+                path.write_text(json.dumps(stored))
+                session = Session(data,payload=payload)
+                session.call('framely.lifecycle.start', error=True)
+                state = session.call('status.get')
+                self.assertTrue(state['autoStart'])
+                self.assertFalse(state['enabled'])
+                self.assertFalse(state['running'])
+                self.assertTrue(json.loads((data/'state.json').read_text())['settings']['autoStart'])
             finally:
                 session.close()
+
+    def test_auto_start_persists_without_enabling_current_proxy(self):
+        self.start_profile()
+        record = json.loads((Path(self.tmp.name)/'core.json').read_text())
+        self.assertFalse(self.session.call('status.get')['autoStart'])
+        state = self.session.call('settings.autoStart', {'enabled':True})
+        self.assertTrue(state['autoStart'])
+        self.assertFalse(state['enabled'])
+        self.assertEqual(json.loads((Path(self.tmp.name)/'core.json').read_text())['pid'], record['pid'])
+        self.session.call('settings.autoStart', {'enabled':'true'}, error=True)
+        self.assertTrue(self.session.call('status.get')['autoStart'])
+        self.session.call('framely.lifecycle.start')
+        self.assertFalse(self.session.call('status.get')['enabled'])
+        self.session.call('settings.autoStart', {'enabled':False})
+        self.session.close()
+        # A legacy persisted enabled flag must not override the new opt-in setting.
+        path = Path(self.tmp.name)/'state.json'
+        stored = json.loads(path.read_text())
+        stored['settings']['enabled'] = True
+        stored['settings'].pop('autoStart')
+        path.write_text(json.dumps(stored))
+        self.session = Session(self.tmp.name)
+        self.session.call('framely.lifecycle.start')
+        state = self.session.call('status.get')
+        self.assertFalse(state['autoStart'])
+        self.assertFalse(state['enabled'])
+
+    def test_auto_start_without_profile_survives_restart(self):
+        self.session.call('framely.lifecycle.start')
+        self.session.call('settings.autoStart', {'enabled':True})
+        self.session.close()
+        self.session = Session(self.tmp.name)
+        self.session.call('framely.lifecycle.start')
+        state = self.session.call('status.get')
+        self.assertTrue(state['autoStart'])
+        self.assertFalse(state['enabled'])
+        self.assertFalse(state['running'])
 
     def test_browser_configuration_before_core_start(self):
         self.session.call('framely.lifecycle.start')
@@ -265,6 +315,8 @@ class Integration(unittest.TestCase):
                 rpc('status.get',authorization=authorization,request_origin=request_origin)
             self.assertEqual(result.exception.code,code)
         self.assertFalse(rpc('status.get')['result']['configured'])
+        self.assertTrue(rpc('settings.autoStart', {'enabled':True})['result']['autoStart'])
+        self.assertFalse(rpc('settings.autoStart', {'enabled':False})['result']['autoStart'])
         empty=client.open(rpc('window.get',{'window':'main'})['result']['url']).read().decode()
         self.assertIn('内核未运行',empty)
         self.assertIn('/window.js',empty)
