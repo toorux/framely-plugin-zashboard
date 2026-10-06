@@ -1,0 +1,4 @@
+{
+  "compilerOptions": {"target": "ES2022", "module": "ESNext", "moduleResolution": "Bundler", "jsx": "react-jsx", "strict": true, "skipLibCheck": true, "allowSyntheticDefaultImports": true, "esModuleInterop": true, "lib": ["ES2022", "DOM"]},
+  "include": ["ui/**/*.tsx", "ui/**/*.ts", "ui/**/*.d.ts", "vendor/framely-sdk/src/**/*.ts", "vendor/framely-sdk/src/**/*.tsx"]
+}

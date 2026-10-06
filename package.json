@@ -1,0 +1,17 @@
+{
+  "name": "framely-plugin-zashboard",
+  "version": "0.1.0-preview.15",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:ui": "node scripts/build.mjs --ui-only",
+    "typecheck": "tsc --noEmit",
+    "test": "bash scripts/test.sh",
+    "pack": "python3 scripts/pack.py",
+    "preview": "python3 scripts/preview.py"
+  },
+  "dependencies": {"@framely/sdk": "file:vendor/framely-sdk", "react": "19.2.0", "react-dom": "19.2.0"},
+  "devDependencies": {"@types/react": "19.2.0", "@types/react-dom": "19.2.0", "esbuild": "0.25.10", "typescript": "5.9.3"}
+}

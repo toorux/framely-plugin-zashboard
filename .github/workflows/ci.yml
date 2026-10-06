@@ -1,0 +1,47 @@
+name: Build plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - run: npm ci
+      - run: npm run typecheck
+      - run: cargo fmt --check --manifest-path backend/Cargo.toml
+      - run: npm run build
+      - run: npm test
+      - run: npm run pack
+      - name: Verify checksum
+        working-directory: dist
+        run: sha256sum --check SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zashboard-arm64-${{ github.sha }}
+          path: |
+            dist/*.framely
+            dist/SHA256SUMS
+          if-no-files-found: error

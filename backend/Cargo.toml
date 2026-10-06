@@ -1,0 +1,19 @@
+[package]
+name = "framely-zashboard"
+version = "0.1.0"
+edition = "2021"
+license = "AGPL-3.0-only"
+
+[dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+libc = "0.2"
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "json", "rustls"] }
+tiny_http = "0.12"
+percent-encoding = "2"
+
+[profile.release]
+lto = "thin"
+strip = true
